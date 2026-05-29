@@ -10,7 +10,6 @@ A comprehensive collection of [agent skills](https://agentskills.io/) for the Me
 
 ## Table of Contents
 
-- [Background](#background)
 - [Skills](#skills)
 - [Usage](#usage)
 - [Contributing](#contributing)
