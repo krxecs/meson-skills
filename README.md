@@ -52,7 +52,9 @@ The repository contains the following agent skills, organized by topic:
 
 ## Usage
 
-WIP
+```sh
+npx skills add krxecs/meson-skills
+```
 
 ## Contributing
 
