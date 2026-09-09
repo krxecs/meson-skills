@@ -27,7 +27,7 @@ Use the verbose link command to identify the missing or duplicate symbol and the
 ```bash
 meson compile -C builddir target-name -v
 meson introspect builddir --targets
-nm builddir/path/from/introspection | rg 'symbol_name'
+nm builddir/path/from/introspection | grep 'symbol_name'
 ```
 
 Pass libraries with `link_with` or dependency objects with `dependencies`. Do not copy a dependency object's raw flags into consumers.

@@ -21,7 +21,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.1.0',
+  meson_version: '>=1.7.0',
   license: 'MIT',
   license_files: ['LICENSE'],
   default_options: [
@@ -141,4 +141,3 @@ Document how the project fits those ecosystems instead of assuming every consume
 - tests and install commands: `meson-testing-installation`
 - build-tree structure and dependencies: `meson-advanced-project-design`
 - complete examples: `meson-patterns-cookbook`
-

@@ -51,7 +51,7 @@ meson setup builddir --cross-file cross/i686.ini
 ## Kernel target
 
 ```meson
-project('kernel', 'c', meson_version: '>=1.1.0')
+project('kernel', 'c', meson_version: '>=1.7.0')
 
 linker_script = files('arch/i686/linker.ld')
 

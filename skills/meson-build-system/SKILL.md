@@ -37,7 +37,7 @@ Inspect the project before recommending a command or changing a build definition
 - Export reusable interfaces with `declare_dependency()` instead of duplicating flags.
 - Treat build directories as disposable; do not store source of truth there.
 - Prefer built-in standards and options over manual compiler flags.
-- Set `meson_version` to the oldest Meson release required by the APIs in use and the project's supported environments. Use the repository's actual license file name in `license_files`.
+- Use the repository baseline selected by `meson-version-compatibility`. Raise it only when a required API needs a newer Meson release. Use the repository's actual license file name in `license_files`.
 
 ```meson
 project(
@@ -45,7 +45,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.1.0',
+  meson_version: '>=1.7.0',
   license: 'MIT',
   license_files: ['LICENSE.md'],
   default_options: [

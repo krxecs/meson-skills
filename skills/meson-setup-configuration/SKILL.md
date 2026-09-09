@@ -50,7 +50,7 @@ Use build types as workflow choices, not as hidden policy inside every project e
 
 ## Project header
 
-Choose `meson_version` from the APIs the project uses and the environments it supports. The following header uses `license_files`, which requires Meson 1.1.0:
+Use the repository baseline selected by `meson-version-compatibility`. Raise it only when a required API needs a newer Meson release:
 
 ```meson
 project(
@@ -58,7 +58,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.1.0',
+  meson_version: '>=1.7.0',
   license: 'MIT',
   license_files: ['LICENSE'],
   default_options: [

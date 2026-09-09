@@ -13,8 +13,8 @@ i686-elf-gcc -dumpmachine
 Confirm that the linker script's `ENTRY()` name matches a global symbol in the startup object.
 
 ```bash
-i686-elf-nm builddir/path/to/entry.o | rg ' _start$'
-rg 'ENTRY\(' arch/i686/linker.ld
+i686-elf-nm builddir/path/to/entry.o | grep -E ' _start$'
+grep -F 'ENTRY(' arch/i686/linker.ld
 ```
 
 Source-list order is not a reliable fix. Define the entry point and placement in the source and linker script.

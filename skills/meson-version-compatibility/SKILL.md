@@ -5,23 +5,29 @@ description: Choose and verify Meson version requirements. Use for `meson_versio
 
 # Meson version compatibility
 
-Choose the minimum version from evidence, not from one universal baseline.
+Select one distribution baseline for this repository, then use it consistently in every project example.
 
 ## Workflow
 
-1. Inspect the project's current `meson_version`, APIs, options, and CI or packaging targets.
-2. Find the earliest Meson release that supports every required feature in the official reference and release notes.
-3. Check the Meson versions available in each environment the project promises to support. Use current package data when distribution compatibility matters.
-4. Set the lowest version that satisfies both the required APIs and the support policy.
-5. Configure with that exact minimum version when practical. The check is complete when setup succeeds or the unsupported feature reports the expected version error.
+1. When web access is available, identify the latest Ubuntu LTS, Debian stable, and Fedora stable releases from their official release pages.
+2. Read each release's Meson version from its official package index. Compare the upstream version components and select the oldest. This is the repository baseline.
+3. Inspect the APIs and options used in each example against the official Meson reference and release notes.
+4. Use an equivalent API supported by the baseline when practical. If an example requires a newer API, raise that example's `meson_version` and state why.
+5. Set the selected baseline in every other `project()` definition.
+6. Configure the examples with the exact baseline. The check is complete when they all configure successfully and every higher-version exception is documented.
+
+If web access is unavailable, ask the user which Meson version to target and suggest the locally installed version as a fallback. Do not silently replace the repository policy with an API-derived minimum.
 
 ## Policy
 
-- set `meson_version` in each top-level `project()` declaration
-- attach version notes to the feature that needs them
-- avoid legacy APIs unless a migration note is the point of the section
-- preserve an older API when the supported Meson range requires it
-- distinguish Meson, compiler, linker, and backend constraints
+- Set the selected baseline in every `project()` declaration unless a documented feature requires a higher version.
+- Write new examples for the current repository baseline first.
+- Attach higher-version requirements to the feature that needs them.
+- Avoid legacy APIs unless migration is the subject.
+- Prefer modern accessors, option syntax, and dependency declarations supported by the baseline.
+- Keep deprecation notes concise and actionable.
+- Do not add compatibility ladders outside migration guidance.
+- Distinguish Meson, compiler, linker, and backend constraints.
 
 ## Replace older APIs
 
@@ -52,7 +58,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.1.0',
+  meson_version: '>=1.7.0',
   license: 'MIT',
   license_files: ['LICENSE'],
   default_options: [
@@ -63,7 +69,7 @@ project(
 )
 ```
 
-Name the feature that sets the bound. In this example, `license_files` requires Meson 1.1.0. Raise the bound if another API requires a newer release.
+The repository currently uses Meson 1.7.0 because it is the oldest version selected by the distribution policy above. The `license_files` API needs only Meson 1.1.0, but an API floor does not override the repository baseline. Recompute the distribution baseline before changing it.
 
 ## Common mistakes
 
