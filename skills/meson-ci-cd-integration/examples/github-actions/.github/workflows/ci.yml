@@ -23,7 +23,7 @@ jobs:
           path: |
             ~/.cache/ccache
             subprojects/packagecache
-          key: ${{ runner.os }}-meson-${{ matrix.buildtype }}-${{ hashFiles('meson.build', 'meson_options.txt', '**/*.wrap') }}
+          key: ${{ runner.os }}-meson-${{ matrix.buildtype }}-${{ hashFiles('meson.build', 'meson.options', '**/*.wrap') }}
       - run: meson setup builddir --buildtype=${{ matrix.buildtype }} -Dwarning_level=3
       - run: meson compile -C builddir
       - run: meson test -C builddir --print-errorlogs

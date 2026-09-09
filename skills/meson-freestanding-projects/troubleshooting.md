@@ -1,161 +1,79 @@
-# Meson Freestanding Projects — Troubleshooting
+# Troubleshoot freestanding builds
 
-## `Compiler not found` for freestanding target
+## Compiler not found
 
-**Solution:** The cross-compiler is not installed. Build with crosstool-NG or use a prebuilt toolchain.
-
-```bash
-ct-ng i686-elf
-ct-ng build
-# Prebuilt: https://github.com/lordmilko/i686-elf-tools
-```
-
-For ARM: `apt install gcc-arm-none-eabi`.
-
-## `Undefined reference to '_start'`
-
-**Solution:** Entry point symbol is missing or link order is wrong.
+Confirm every executable named in `[binaries]` exists on `PATH` or use an absolute path. Check the compiler's target before configuring:
 
 ```bash
-# Check ENTRY() directive in linker script
-grep ENTRY linker.ld
-# Ensure entry assembly file is listed first in executable()
-# executable('kernel.elf', 'src/entry.s', 'src/main.c', ...)
+i686-elf-gcc -dumpmachine
 ```
 
-## `Multiple definition of _start`
+## Entry point is undefined
 
-**Solution:** Compiler provides default CRT files. Add `-nostartfiles` to link args.
+Confirm that the linker script's `ENTRY()` name matches a global symbol in the startup object.
 
-```ini
-[built-in options]
-c_link_args = ['-nostdlib', '-nostartfiles', '-Wl,--gc-sections']
+```bash
+i686-elf-nm builddir/path/to/entry.o | grep -E ' _start$'
+grep -F 'ENTRY(' arch/i686/linker.ld
 ```
 
-## `Undefined reference` to libc functions (memcpy, memset, printf)
+Source-list order is not a reliable fix. Define the entry point and placement in the source and linker script.
 
-**Solution:** Freestanding targets have no libc. Provide your own or use picolibc.
+## Hosted startup symbols conflict
+
+Inspect the verbose link command. A freestanding target normally links with `-nostdlib` or an equivalent toolchain option. Remove hosted CRT objects unless the selected runtime requires them.
+
+## Runtime symbols are undefined
+
+Calls such as `memcpy`, `memset`, division helpers, or C++ ABI routines may come from compiler output even when the source does not call them directly.
+
+```bash
+i686-elf-nm -u builddir/kernel.elf
+```
+
+Provide ABI-compatible implementations or link the appropriate compiler and C runtime libraries. Do not add a hosted system library from the build machine.
+
+## Linker script changes do not rebuild
+
+Add the script to `link_depends` as well as `link_args`:
 
 ```meson
-picolibc_dep = subproject('picolibc').get_variable('picolibc_lib')
-kernel = executable('kernel.elf', ..., dependencies: picolibc_dep)
-```
-
-## `Cannot open linker script`
-
-**Solution:** Use an absolute path via `meson.current_source_dir()`.
-
-```meson
-link_args: ['-Wl,-T,' + meson.current_source_dir() + '/linker.ld']
-# NOT: link_args: ['-Wl,-T,linker.ld']  (relative to build dir)
-```
-
-## ELF file not bootable (GRUB/QEMU won't load it)
-
-**Solution:** Multiboot header missing or not within the first 8 KB of the binary.
-
-```bash
-# Check header presence and offset
-readelf -S build/kernel.elf | grep multiboot
-objdump -d build/kernel.elf | head -20
-```
-
-Ensure `.multiboot` is the first section in the linker script:
-
-```ld
-SECTIONS {
-    . = 1M;
-    .multiboot : { KEEP(*(.multiboot)) }   # MUST be first and retained
-    .text : { *(.text) }
-    ...
-}
-```
-
-## Linker discards needed sections
-
-**Solution:** `--gc-sections` removes sections not explicitly kept. Wrap critical sections with `KEEP()`.
-
-```ld
-.multiboot : { KEEP(*(.multiboot)) }
-.init_array : {
-    __init_array_start = .;
-    KEEP(*(.init_array))
-    __init_array_end = .;
-}
-```
-
-## Page fault immediately after boot
-
-**Solution:** Memory layout mismatch. Check the kernel link address and ensure valid stack before first C call.
-
-```bash
-readelf -l build/kernel.elf | grep LOAD
-# Verify identity mapping of lower memory for early boot
-# Ensure stack pointer is valid before jumping to main()
-```
-
-## Code works in QEMU but crashes on real hardware
-
-**Solution:** Hardware-specific initialization differs (APIC vs PIC, HPET vs PIT, PCI enumeration).
-
-```bash
-# Try different QEMU machine models
-qemu-system-i386 -machine pc -kernel build/kernel.elf
-qemu-system-i386 -machine q35 -kernel build/kernel.elf
-```
-
-## GRUB can't find kernel on ISO
-
-**Solution:** ISO directory structure is wrong.
-
-```bash
-# Expected layout:
-# iso/boot/kernel.elf
-# iso/boot/grub/grub.cfg
-isoinfo -l -i kernel.iso
-```
-
-## Subproject picolibc fails to build
-
-**Solution:** Picolibc may need a native file for its code generators.
-
-```bash
-meson setup build \
-  --cross-file i686-elf.ini \
-  --native-file native.ini
-```
-
-Or build picolibc separately and link as an external library.
-
-## Custom target for ISO is stale after kernel changes
-
-**Solution:** Ensure the custom target's `input:` references the kernel executable.
-
-```meson
-custom_target('kernel.iso',
-  input: kernel,          # Depend on kernel target
-  output: 'kernel.iso',
-  command: [...],
-  build_by_default: true,
+script = files('arch/i686/linker.ld')
+executable(
+  'kernel',
+  sources,
+  name_suffix: 'elf',
+  link_args: ['-Wl,-T,' + meson.current_source_dir() / 'arch/i686/linker.ld'],
+  link_depends: script,
 )
 ```
 
-## Section not placed in expected region
+## A required section disappears
 
-**Solution:** The linker script doesn't cover all compiler-emitted sections. Add wildcard patterns.
+`--gc-sections` removes unreferenced input sections. Retain boot headers, vectors, and constructor tables in the linker script:
 
 ```ld
-.text : { *(.text) *(.text.*) }
-.rodata : { *(.rodata) *(.rodata.*) }
+.multiboot : { KEEP(*(.multiboot)) }
+.init_array : { KEEP(*(.init_array .init_array.*)) }
 ```
 
-See what sections the compiler produces:
+## GRUB rejects the kernel
+
+Check the completed file instead of inferring validity from section names:
 
 ```bash
-readelf -S build/kernel.elf
+grub-file --is-x86-multiboot builddir/kernel.elf
 ```
 
+For Multiboot 1, confirm that the complete header lies within the first 8192 bytes and has the required alignment and checksum.
 
-## Language Standard Mismatch for Freestanding Target
+## The emulator resets or hangs
 
-Freestanding toolchains may not support all hosted-mode `c_std` values. If the compiler rejects a standard flag, check what the toolchain's GCC defaults to (`gcc -v` or the `--std=` flags it actually implements) and set `c_std` / `cpp_std` accordingly in the machine file's `[built-in options]`. Modern `-elf` toolchains commonly default to `c17` / `c++20`.
+Separate build validity from runtime diagnosis:
+
+1. Check the ELF machine, entry point, and program headers.
+2. Confirm the image or firmware loader accepts the artifact.
+3. Start the emulator with serial output and no automatic reboot.
+4. Attach a debugger at the reset or entry address.
+
+The Meson task is complete when it produces the expected artifact with the correct dependencies. Boot behavior may require architecture-specific debugging beyond the build definition.

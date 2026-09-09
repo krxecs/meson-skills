@@ -3,7 +3,7 @@ name: meson-debugging-troubleshooting
 description: Diagnose Meson setup, compile, test, dependency, and install failures. Use for mysterious build errors, stale build directories, dependency resolution problems, cross-file issues, backend mismatches, and configuration drift.
 ---
 
-# Meson Debugging & Troubleshooting
+# Debug Meson failures
 
 Use this skill when the build is not behaving the way the user expects and the failure is not just a simple command typo.
 
@@ -18,13 +18,15 @@ meson introspect builddir --dependencies
 meson introspect builddir --tests
 ```
 
-## Debugging order
+## Workflow
 
 1. read the exact error message
 2. identify whether the error happens at setup, compile, test, or install time
 3. inspect Meson's view of the build with introspection
 4. check the source tree and build directory for drift
 5. check whether the issue is actually a compiler, linker, or dependency problem
+
+Stop when one cause explains the failure and a focused rerun confirms the fix. Record the exact failing stage, command, and diagnostic when the fix cannot be applied.
 
 ## Setup problems
 
@@ -60,17 +62,17 @@ meson introspect builddir --tests
 
 - changing the toolchain without wiping or reconfiguring
 - assuming Meson silently rescans every external dependency on every command
-- treating stale build directories as “Meson bugs”
+- treating stale build directories as "Meson bugs"
 - hiding the real problem behind a too-small snippet
 
 ## What belongs elsewhere
 
-- setup options and defaults → `meson-setup-configuration`
-- target declarations and compile selection → `meson-compile-targets`
-- cross files and machine configuration → `meson-cross-compilation`
-- tests and install commands → `meson-testing-installation`
-- fallback dependencies and wraps → `meson-subprojects-management`
+- setup options and defaults: `meson-setup-configuration`
+- target declarations and compile selection: `meson-compile-targets`
+- cross files and machine configuration: `meson-cross-compilation`
+- tests and install commands: `meson-testing-installation`
+- fallback dependencies and wraps: `meson-subprojects-management`
 
 ## Related setup guidance
 
-For language standard selection during migration, see `meson-setup-configuration/SKILL.md`. This skill focuses on debugging and troubleshooting.
+Read [reference.md](reference.md) for diagnostic commands. Read [troubleshooting.md](troubleshooting.md) for common failure shapes. For language standard selection during migration, use `meson-setup-configuration`.

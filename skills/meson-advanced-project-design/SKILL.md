@@ -1,13 +1,16 @@
 ---
 name: meson-advanced-project-design
-description: Advanced Meson architecture, feature options, dependency objects, generated sources, project layout, build reproducibility, and scalable project organization. Use when the user discusses project structure beyond basic build setup or asks about idiomatic Meson patterns.
+description: Design larger Meson projects. Use for feature options, dependency objects, generated sources, library boundaries, reproducibility, or project layout beyond initial setup.
 ---
 
-# Advanced Meson Project Design
+# Advanced Meson project design
 
-Use this skill when the user is deciding how to structure a serious Meson project rather than how to type a single command.
+## Workflow
 
-Runnable examples live under this skill's `examples/` directory.
+1. Inspect the existing target, directory, dependency, and option boundaries.
+2. Identify the one boundary causing duplication, hidden state, or unnecessary coupling.
+3. Change that boundary without changing unrelated build behavior.
+4. Configure and compile every affected target. Run affected tests when available.
 
 ## Design goals
 
@@ -85,7 +88,7 @@ mylib_dep = declare_dependency(
 
 That pattern gives consumers one dependency object instead of a pile of copied flags.
 
-## Static vs shared libraries
+## Static and shared libraries
 
 Choose the library type deliberately.
 
@@ -122,7 +125,7 @@ Use `custom_target()` when you need one-off commands and `generator()` when the 
 - use `summary()` to print final configuration choices clearly
 - prefer deterministic generation scripts and pinned tool versions in CI
 
-## Why not to vendor blindly
+## Vendoring costs
 
 Vendoring is convenient, but it is not free.
 
@@ -138,11 +141,11 @@ Prefer a system dependency when packaging rules and platform support allow it. V
 
 ## What belongs elsewhere
 
-- complete runnable examples → `meson-patterns-cookbook`
-- install layout and releases → `meson-package-export-distribution`
-- CI recipes → `meson-ci-cd-integration`
-- dependency fallbacks and vendoring policy → `meson-subprojects-management`
-- version and deprecation details → `meson-version-compatibility`
+- complete examples: `meson-patterns-cookbook`
+- install layout and releases: `meson-package-export-distribution`
+- CI recipes: `meson-ci-cd-integration`
+- dependency fallbacks and vendoring policy: `meson-subprojects-management`
+- version and deprecation details: `meson-version-compatibility`
 
 ## Common mistakes
 
@@ -152,6 +155,4 @@ Prefer a system dependency when packaging rules and platform support allow it. V
 - building the same dependency both as a system package and as a vendored copy without a policy
 - letting target-local behavior leak into global build state
 
-See [reference.md](reference.md) for a `declare_dependency()` quick reference, feature option syntax, library type guidance, and `custom_target()` vs `generator()` comparison. See [troubleshooting.md](troubleshooting.md) for common design mistake diagnosis.
-
-
+Read [reference.md](reference.md) when exact feature-option, dependency-object, library-type, generator, or layout syntax matters. Read [troubleshooting.md](troubleshooting.md) when arguments leak, generated files are misplaced, or consumers cannot use an exported target.

@@ -5,7 +5,6 @@ project(
   version: '0.1.0',
   meson_version: '>=1.7.0',
   license: '0BSD',
-  license_files: ['LICENSE.md'],
   default_options: [
     'c_std=c17',
     'cpp_std=c++20',

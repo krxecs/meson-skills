@@ -1,4 +1,4 @@
-# Meson Debugging & Troubleshooting — Reference
+# Meson debugging reference
 
 ## Useful commands
 
@@ -30,7 +30,7 @@ meson install -C builddir --dry-run
 - test failure: runtime, fixture, or environment issue
 - install failure: missing install metadata or wrong install path
 
-## Good investigation habits
+## Investigation habits
 
 - reproduce with one command at a time
 - keep the build tree and source tree separate
@@ -44,6 +44,6 @@ meson install -C builddir --dry-run
 - assuming a build-tree error is a Meson parser bug
 - skipping the backend log and only reading the high-level summary
 
-## Language Standard Selection
+## Language standard selection
 
-For language standard selection guidance consult `meson-setup-configuration/SKILL.md` — this skill focuses on debugging and troubleshooting.
+For language standard selection, use `meson-setup-configuration`.

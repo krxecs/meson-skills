@@ -1,34 +1,33 @@
 ---
 name: meson-build-system
-description: Entry point for Meson questions. Use this skill for general Meson syntax, project structure, build directory basics, and the standard setup-compile-test-install flow. Route option setup, target building, testing, cross-compilation, subprojects, CI, debugging, version compatibility, packaging, and pattern examples to the specialized skills below.
+description: Route Meson work to the skill that owns it. Use for general Meson syntax, basic project files, build directories, or requests that span several Meson topics.
 ---
 
-# Meson Build System
+# Meson build system
 
-Meson is a declarative build system. Start here when the user asks about `meson.build` syntax, target declarations, build directories, or the standard workflow of setup, compile, test, and install.
+Inspect the project before recommending a command or changing a build definition. Read `meson.build`, `meson.options`, machine files, wrap files, and CI configuration when they bear on the request.
 
 ## Fast path
 
-1. Write or edit `meson.build`
-2. Configure a build directory with `meson setup`
-3. Build with `meson compile -C <builddir>`
-4. Run tests with `meson test -C <builddir>`
-5. Install with `meson install -C <builddir>`
+1. Identify the owning skill below.
+2. Inspect the source and configured build directory before editing.
+3. Apply the smallest change that fits the existing project.
+4. Run the relevant setup, compile, test, or install command. Report any check that could not run.
 
 ## Route to the right skill
 
-- **New project or option setup** → `meson-setup-configuration`
-- **Build a target or inspect target names** → `meson-compile-targets`
-- **Run tests or install into a staging prefix** → `meson-testing-installation`
-- **Different compiler, platform, or machine file** → `meson-cross-compilation`
-- **Wraps, vendored dependencies, or fallback resolution** → `meson-subprojects-management`
-- **CI pipelines, caches, and matrix builds** → `meson-ci-cd-integration`
-- **Hard-to-diagnose setup/compile/test failures** → `meson-debugging-troubleshooting`
-- **Minimum version requirements and deprecations** → `meson-version-compatibility`
-- **Project architecture, dependency design, feature options, generated sources** → `meson-advanced-project-design`
-- **Complete examples and project layouts** → `meson-patterns-cookbook`
-- **Installation layout, pkg-config exports, releases, and packaging** → `meson-package-export-distribution`
-- **Migrating from CMake, Autotools, or plain Makefiles** → `meson-setup-configuration` for language standard selection, `meson-version-compatibility` for baseline guidance
+- New projects, build options, compilers, or build types: `meson-setup-configuration`
+- Target selection, parallel builds, or backend arguments: `meson-compile-targets`
+- Test execution or installation commands: `meson-testing-installation`
+- Cross or native machine files: `meson-cross-compilation`
+- Freestanding, kernel, or bare-metal targets: `meson-freestanding-projects`
+- Wraps, subprojects, or dependency fallbacks: `meson-subprojects-management`
+- CI jobs, matrices, artifacts, or caches: `meson-ci-cd-integration`
+- Unexplained setup, compile, test, or install failures: `meson-debugging-troubleshooting`
+- Minimum Meson versions, removed APIs, or portability: `meson-version-compatibility`
+- Feature options, dependency objects, generated sources, or large project structure: `meson-advanced-project-design`
+- Full reusable examples: `meson-patterns-cookbook`
+- Install layout, pkg-config metadata, releases, or packages: `meson-package-export-distribution`
 
 ## Core rules
 
@@ -38,7 +37,7 @@ Meson is a declarative build system. Start here when the user asks about `meson.
 - Export reusable interfaces with `declare_dependency()` instead of duplicating flags.
 - Treat build directories as disposable; do not store source of truth there.
 - Prefer built-in standards and options over manual compiler flags.
-- Set a modern project baseline explicitly unless the example is intentionally specialized. Use the repository's actual license file name in `license_files` (`LICENSE`, `LICENSE.md`, `LICENSE.rst`, `COPYING`, or a path under a subdirectory) instead of forcing one filename everywhere:
+- Use the repository baseline selected by `meson-version-compatibility`. Raise it only when a required API needs a newer Meson release. Use the repository's actual license file name in `license_files`.
 
 ```meson
 project(
@@ -57,7 +56,7 @@ project(
 )
 ```
 
-## What good Meson looks like
+## Project checks
 
 - A small top-level `meson.build` that wires together subdirectories.
 - Public headers installed separately from private implementation details.
@@ -66,16 +65,12 @@ project(
 - Generated code created in the build tree, not committed to the source tree.
 - Versioned install metadata and pkg-config exports for downstream users.
 
-## Style guide
+## Naming and placement
 
 - Use explicit names for targets and dependency objects.
 - Prefer `foo_dep` for dependency objects, `foo_lib` for libraries, and `foo_test` for test helpers.
 - Keep `subdir()` boundaries shallow and predictable.
 - Put reusable helper functions in `meson.build` only when they truly reduce duplication.
-- Keep project metadata in `project()`, option defaults in `default_options`, and long-lived toggles in `meson_options.txt`.
+- Keep project metadata in `project()`, option defaults in `default_options`, and project options in `meson.options`.
 
-## When a question is broader than one skill
-
-Use this skill for the general framing, then route to the specialized skill that owns the concrete answer. If the user asks for a complete example, prefer `meson-patterns-cookbook`. If they ask how to ship or package the result, prefer `meson-package-export-distribution`.
-
-Runnable examples live under each skill's `examples/` directory.
+For requests that cross several branches, load each relevant skill and reconcile their checks before editing. The task is complete when the requested behavior works and every relevant check has a recorded result.

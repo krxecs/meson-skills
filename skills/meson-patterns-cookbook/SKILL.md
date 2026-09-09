@@ -1,20 +1,20 @@
 ---
 name: meson-patterns-cookbook
-description: Canonical Meson project layouts and complete patterns for libraries, executables, generated sources, plugin systems, fallback dependencies, and anti-patterns. Use when the user wants a full example or a reusable project template.
+description: Provide complete Meson examples. Use when the user wants a reusable project layout for a library, executable, generated source, plugin, mixed-language target, or dependency fallback.
 ---
 
-# Meson Patterns Cookbook
+# Meson patterns cookbook
 
-This skill gives complete patterns, not just fragments.
+Choose the smallest pattern that covers the request. Adapt names, languages, versions, and installation paths to the project instead of copying a template unchanged.
 
-The runnable examples in this repository are colocated under the owning skills' `examples/` directories; this skill acts as the index for the reusable patterns.
+The example is complete when a fresh setup can compile it and any declared test or staged install succeeds.
 
-## Golden project layout
+## Project layout
 
 ```text
 project/
 ├── meson.build
-├── meson_options.txt
+├── meson.options
 ├── include/
 ├── src/
 ├── tests/
@@ -22,7 +22,7 @@ project/
 └── tools/
 ```
 
-A small project may omit directories it does not need, but the layout should still be obvious to a newcomer.
+A small project should omit directories it does not need.
 
 ## Minimal vs production-oriented examples
 
@@ -135,12 +135,13 @@ Use this pattern when a project exposes a C ABI but uses C++ internally or vice 
 
 ```meson
 python = find_program('python3', required: true)
+gen_script = files('scripts/gen-config.py')
 
 gen = custom_target(
   'generated-config',
   input: 'config.in.h',
   output: 'config.h',
-  command: [python, 'scripts/gen-config.py', '@INPUT@', '@OUTPUT@'],
+  command: [python, gen_script, '@INPUT@', '@OUTPUT@'],
 )
 
 sources = [gen, 'src/main.cpp']
@@ -199,5 +200,3 @@ This is useful when the project supports both system and vendored dependencies. 
 - generated files live in the build tree
 - subprojects only exist when they genuinely add value
 - examples explain both the minimal case and the production case
-
-

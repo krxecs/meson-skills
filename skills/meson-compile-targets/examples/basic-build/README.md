@@ -1,4 +1,4 @@
-# Basic Build
+# Basic build
 
 Shows named target selection, parallel jobs, verbose output, and `meson introspect --targets`.
 

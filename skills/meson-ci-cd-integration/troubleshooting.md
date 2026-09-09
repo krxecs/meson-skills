@@ -1,4 +1,4 @@
-# Meson CI/CD Integration — Troubleshooting
+# Troubleshoot Meson in CI
 
 ## `meson: command not found`
 
@@ -12,17 +12,16 @@ Install Ninja explicitly or use the platform package manager image that already 
 
 This usually means the cached build tree no longer matches the compiler, Meson version, options, or source tree.
 
-**Fix:** delete the build directory or reconfigure it cleanly.
-
-```bash
-rm -rf builddir
-meson setup builddir
-```
-
-If you intentionally reused the same build directory in the same environment, clear stale state first:
+Reconfigure first:
 
 ```bash
 meson setup builddir --reconfigure --clearcache
+```
+
+If the configuration itself is invalid, resolve the job's exact build directory and recreate it:
+
+```bash
+meson setup builddir --wipe
 ```
 
 ## Tests pass locally but fail in CI
@@ -38,5 +37,3 @@ Use stable cache keys based on the lock-step inputs that actually affect the bui
 - wrap files
 - machine files
 - build options
-
-

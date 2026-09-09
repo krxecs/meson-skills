@@ -1,4 +1,4 @@
-# Reusable Library
+# Reusable library
 
 Build a library, export a dependency object, install headers, and generate pkg-config metadata.
 

@@ -1,4 +1,4 @@
-# Cross Compilation
+# Cross compilation
 
 Shows a native tool used by the build and a separate cross file for the host target.
 

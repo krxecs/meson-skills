@@ -1,4 +1,4 @@
-# Generated Sources
+# Generated sources
 
 Shows both `custom_target()` and `generator()`.
 

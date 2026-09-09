@@ -1,4 +1,4 @@
-# Executable With Tests
+# Executable with tests
 
 A small application and a test binary share the same core code.
 

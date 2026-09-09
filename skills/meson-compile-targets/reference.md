@@ -1,4 +1,4 @@
-# Meson Compile Targets — Reference
+# Meson target compilation reference
 
 ## Target declarations
 
@@ -18,7 +18,7 @@ myapp = executable(
 
 ```bash
 meson compile -C builddir myapp
-meson compile -C builddir path/to/myapp
+meson compile -C builddir myapp:executable
 ```
 
 ## Useful inspection commands
@@ -33,5 +33,3 @@ meson compile -C builddir -v
 - target names come from `executable()`, `library()`, `shared_module()`, and other target declarations
 - `meson compile` forwards to the configured backend
 - flags configured during setup are part of the build tree, not the source tree
-
-

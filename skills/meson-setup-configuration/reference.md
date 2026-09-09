@@ -1,122 +1,74 @@
-# Reference: meson setup Command-Line Options
+# `meson setup` option reference
+
+Check `meson setup --help` for the installed Meson version. Options added after the project's minimum version need a version note or another spelling.
 
 ## Installation directories
 
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `--prefix PATH` | Installation root | `--prefix=/usr/local` |
-| `--bindir PATH` | Executable directory | `--bindir=bin` |
-| `--datadir PATH` | Data file directory | `--datadir=share` |
-| `--includedir PATH` | Header directory | `--includedir=include` |
-| `--libdir PATH` | Library directory | `--libdir=lib` |
-| `--libexecdir PATH` | Library executable dir | `--libexecdir=libexec` |
-| `--localedir PATH` | Locale data | `--localedir=share/locale` |
-| `--mandir PATH` | Manual pages | `--mandir=share/man` |
-| `--infodir PATH` | Info pages | `--infodir=share/info` |
+| Option | Purpose |
+|---|---|
+| `--prefix PATH` | Final installation prefix |
+| `--bindir PATH` | Executable directory under the prefix |
+| `--includedir PATH` | Header directory under the prefix |
+| `--libdir PATH` | Library directory under the prefix |
+| `--datadir PATH` | Architecture-independent data directory |
+| `--libexecdir PATH` | Helper executable directory |
 
 ## Build configuration
 
-| Option | Purpose | Values |
-|--------|---------|--------|
-| `--buildtype` | Build type | plain, debug, debugoptimized, release, minsize |
-| `--debug` | Include debug symbols | boolean |
-| `--optimization {0,1,2,3,s,g}` | Optimization level | 0=none, 3=max, s=size, g=debug |
-| `--strip` | Strip binaries on install | boolean |
-| `--backend` | Generator backend | ninja, vs, vs2022, xcode, none |
-| `--genvslite {vs2022}` | VS multiconfig helper | Visual Studio helper |
+| Option | Purpose |
+|---|---|
+| `--buildtype VALUE` | Sets `plain`, `debug`, `debugoptimized`, `release`, or `minsize` defaults |
+| `--optimization VALUE` | Sets the optimization level directly |
+| `--debug` | Enables debug information |
+| `--strip` | Strips installed targets |
+| `--backend VALUE` | Selects Ninja, Visual Studio, Xcode, or no backend |
+| `--warnlevel VALUE` | Sets the compiler warning level |
+| `--werror` | Treats compiler warnings as errors |
 
-## Feature control
+Use `-Ddebug=false` or `-Dstrip=false` when a boolean option must be disabled explicitly.
 
-| Option | Purpose | Values |
-|--------|---------|--------|
-| `--auto-features {auto,enabled,disabled}` | Override all auto features | auto, enabled, disabled |
-| `-Doption=value` | Set any option | project-defined options |
-| `--warnlevel {0,1,2,3,everything}` | Compiler warning level | 0=quiet, 3=verbose |
-| `--werror` | Treat warnings as errors | boolean |
-| `-Db_coverage` | Code coverage | true, false |
-| `-Db_sanitize` | Sanitizers | address, memory, thread, undefined |
-| `-Db_lto` | Link-time optimization | true, false, thin |
-| `-Db_pie` | Position-independent exec | true, false |
-| `-Db_staticpic` | Static libs with PIE | true, false |
-| `-Db_pgo` | Profile-guided optimization | off, generate, use |
-
-## Dependency management
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `--wrap-mode` | Wrap dependency handling | default, nofallback, nodownload, forcefallback |
-| `--force-fallback-for NAMES` | Force fallback for specific dependencies | `--force-fallback-for=zlib,openssl` |
-| `--pkg-config-path PATH` | pkg-config search path | `--pkg-config-path=/usr/lib/pkgconfig` |
-| `--cmake-prefix-path PATH` | CMake package path | `--cmake-prefix-path=/usr/share/cmake` |
-
-## Cross-compilation and machine files
-
-| Option | Purpose | Example |
-|--------|---------|---------|
-| `--native-file FILE` | Native file for build-machine tools | `--native-file native.ini` |
-| `--cross-file FILE` | Cross file for target-machine tools | `--cross-file arm-linux.ini` |
-
-## Build directory management
-
-| Option | Purpose | Effect |
-|--------|---------|--------|
-| `--reconfigure` | Reconfigure existing build | Keeps artifacts, updates config |
-| `--wipe` | Wipe and reconfigure | Removes artifacts, starts fresh |
-| `--clearcache` | Clear dependency cache | Removes cached dependency info |
-| `-C DIRECTORY` | Build directory for all commands | `meson compile -C mybuild` |
-
-## Miscellaneous
+## Feature and dependency control
 
 | Option | Purpose |
-|--------|---------|
-| `--errorlogs` | Print logs from failing tests |
-| `--install-umask UMASK` | Umask for installed files |
-| `--layout {mirror,flat}` | Build layout |
-| `-v, --verbose` | Verbose output |
-| `--fatal-meson-warnings` | Treat Meson warnings as errors |
+|---|---|
+| `-Dname=value` | Sets a built-in or project option |
+| `--auto-features=VALUE` | Overrides project feature options whose value is `auto` |
+| `--wrap-mode=VALUE` | Controls subproject fallback and download behavior |
+| `--force-fallback-for=NAMES` | Forces selected dependencies to their fallback |
+| `--pkg-config-path=PATHS` | Adds host-machine pkg-config search paths |
+| `--cmake-prefix-path=PATHS` | Adds host-machine CMake search prefixes |
+
+Thin link-time optimization uses both options:
+
+```bash
+meson setup builddir -Db_lto=true -Db_lto_mode=thin
+```
+
+## Machine files
+
+```bash
+meson setup builddir --native-file native.ini
+meson setup builddir --cross-file cross.ini
+```
+
+A native file configures build-machine tools and native builds. A cross file describes the host machine and its toolchain.
+
+## Existing build directories
+
+| Command | Effect |
+|---|---|
+| `meson configure builddir -Dname=value` | Changes options in place |
+| `meson setup builddir --reconfigure` | Regenerates an existing build |
+| `meson setup builddir --reconfigure --clearcache` | Also clears cached dependency results; `--clearcache` requires Meson 1.3.0 |
+| `meson setup builddir --wipe` | Recreates the build using its recorded command-line options |
+
+Resolve the directory before `--wipe`. It removes build artifacts.
 
 ## Examples
 
-**Setup with custom prefix:**
 ```bash
-meson setup build --prefix=/opt/myapp
+CC=clang CXX=clang++ meson setup builddir -Db_lto=true
+meson setup builddir -Db_sanitize=address
+meson setup builddir --prefix=/usr
+meson configure builddir -Dbuildtype=release
 ```
-
-**Setup with LLVM/Clang and LTO:**
-```bash
-CC=clang CXX=clang++ meson setup build -Db_lto=thin --optimization=3
-```
-
-**Setup with AddressSanitizer:**
-```bash
-meson setup build -Db_sanitize=address
-```
-
-**Setup for ARM cross-compilation:**
-```bash
-meson setup build --cross-file arm-linux.ini
-```
-
-**Setup with code coverage:**
-```bash
-meson setup build -Db_coverage=true
-meson compile -C build
-meson test -C build
-ninja -C build coverage-html
-```
-
-**Setup with Python module configuration:**
-```bash
-meson setup build   -Dpython.platlibdir=/usr/lib/python3.10   -Dpython.purelibdir=/usr/lib/python3/dist-packages
-```
-
-## Common mistakes
-
-- putting standards or compiler flags into `[properties]`
-- forgetting that `meson setup` locks the initial compiler choice
-- relying on old build directories after changing the toolchain
-- treating build types as a substitute for project policy
-
-## Related setup guidance
-
-See `meson-setup-configuration/SKILL.md` for authoritative language standard selection details, including the recommended `default_options` block.

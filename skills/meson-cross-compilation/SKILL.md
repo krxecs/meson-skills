@@ -1,13 +1,19 @@
 ---
 name: meson-cross-compilation
-description: Set up cross-compilation for non-native targets with Meson machine files and toolchain configuration. Use this skill whenever the user is building for a different platform or architecture, mentions a cross file or native file, asks about toolchain configuration, or hits errors related to architecture mismatches, sysroots, or missing cross-compilers.
+description: Configure Meson cross builds. Use for cross or native machine files, toolchains, sysroots, executable wrappers, architecture mismatches, or build-machine tools used during a cross build.
 ---
 
-# Meson Cross-Compilation
+# Meson cross-compilation
 
 Cross-compilation means building on one machine for another machine. Meson uses machine files to describe the compiler, target platform, and any target-specific properties.
 
-Runnable examples live under this skill's `examples/` directory.
+## Workflow
+
+1. Identify the build, host, and target machines. Most cross builds need only the build and host machines.
+2. Inspect the toolchain and sysroot before writing a machine file.
+3. Put compiler settings in `[built-in options]` and project-specific metadata in `[properties]`.
+4. Configure a fresh build directory with the cross file.
+5. Confirm the selected compilers and dependencies in `meson-logs/meson-log.txt` and with introspection.
 
 ## Quick start
 
@@ -74,7 +80,7 @@ meson setup builddir --cross-file cross.ini
 
 Use a native file for build tools that must run on the build machine, such as code generators, formatters, or helper executables.
 
-## [properties] vs [built-in options]
+## `[properties]` and `[built-in options]`
 
 - `[properties]` is for machine-specific metadata and custom values that Meson reads with `meson.get_external_property()`.
 - `[built-in options]` is for compiler and linker configuration, including standards, warning levels, and argument lists.
@@ -93,6 +99,8 @@ If the compiler, linker, or sysroot is wrong, Meson is usually exposing a toolch
 - assuming the build machine can run target binaries directly
 - forgetting to use a native file for build-only helper programs
 
-## Language Standard Selection
+## Language standard selection
 
-Language standards are set via `[built-in options]` in the machine file (see `meson-setup-configuration/SKILL.md` for the authoritative guidance).
+Set language standards in the machine file's `[built-in options]`. Use `meson-setup-configuration` to choose the standards during a migration.
+
+Read [reference.md](reference.md) for machine-file sections and custom properties. Read [troubleshooting.md](troubleshooting.md) when Meson selects the wrong tools or resolves dependencies outside the sysroot.
