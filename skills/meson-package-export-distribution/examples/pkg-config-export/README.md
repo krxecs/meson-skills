@@ -1,4 +1,4 @@
-# Pkg-config Export
+# pkg-config export
 
 Shows library installation, header installation, and `pkg.generate()` for downstream consumers.
 

@@ -1,9 +1,9 @@
 ---
 name: meson-setup-configuration
-description: Configure Meson build directories, set compiler options, define build types, and manage build-time options. Use this skill when setting up a new build, switching compilers, enabling debug or release modes, setting sanitizers, changing optimization levels, or modifying any build option via `-D` flags or `meson configure`.
+description: Configure Meson build directories and options. Use for initial setup, compiler selection, build types, sanitizers, optimization, installation prefixes, `-D` options, reconfiguration, or wipes.
 ---
 
-# Meson Setup and Configuration
+# Meson setup and configuration
 
 `meson setup` creates the build directory and locks in the compiler, toolchain, and option set. Use `meson configure` for later edits and `meson setup --reconfigure` when the build state should be refreshed.
 
@@ -12,6 +12,13 @@ description: Configure Meson build directories, set compiler options, define bui
 ```bash
 meson setup builddir -Dwarning_level=3
 ```
+
+## Workflow
+
+1. Inspect `project()`, `meson.options`, existing build directories, and machine files.
+2. Decide whether the request needs a new setup, `meson configure`, `--reconfigure`, or `--wipe`.
+3. Apply options on the command line or in their owning project file.
+4. Confirm the result with `meson configure builddir` or `meson introspect builddir --buildoptions`.
 
 ## Common configuration goals
 
@@ -38,12 +45,12 @@ Use build types as workflow choices, not as hidden policy inside every project e
 - set compiler selection before the first `meson setup`
 - edit options with `meson configure` instead of rewriting the build tree by hand
 - wipe or reconfigure when the toolchain changes
-- keep project options in `meson_options.txt` and `project(default_options: ...)`
+- keep project options in `meson.options` and defaults in `project(default_options: ...)`
 - use built-in options for standards and warning levels rather than manual `-std=` flags
 
-## Modern baseline
+## Project header
 
-All examples in this repository assume `meson_version: '>=1.7.0'` and the following standard project header:
+Choose `meson_version` from the APIs the project uses and the environments it supports. The following header uses `license_files`, which requires Meson 1.1.0:
 
 ```meson
 project(
@@ -51,7 +58,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.7.0',
+  meson_version: '>=1.1.0',
   license: 'MIT',
   license_files: ['LICENSE'],
   default_options: [
@@ -70,7 +77,7 @@ project(
 - forcing production-only settings into beginner examples
 - confusing project defaults with per-build workflow decisions
 
-## Language Standard Selection Guidance
+## Language standard selection
 
 When migrating a project to Meson:
 
@@ -79,6 +86,8 @@ When migrating a project to Meson:
 3. Inspect plain Makefiles for `-std=` flags.
 4. Inspect CI configurations and compiler invocation scripts.
 5. If the standards still cannot be deduced, ask the user directly which C and C++ standards they want.
-6. If the project is being created from scratch and the user has no preference, default to the `default_options` block in the project header above.
+6. For a new project with no stated constraint, choose standards supported by its compiler baseline and record the choice in `default_options`.
 
 Do not silently change language standards during Meson migration.
+
+Read [reference.md](reference.md) when exact setup flags or built-in option values matter. Read [troubleshooting.md](troubleshooting.md) when setup state, compiler selection, or cached dependencies do not match the request.

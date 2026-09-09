@@ -1,13 +1,17 @@
 ---
 name: meson-package-export-distribution
-description: Install Meson projects correctly, export pkg-config metadata, version libraries, create release tarballs, and prepare packages for downstream consumers. Use when the user asks about install layout, pkg-config, DESTDIR, meson dist, releases, or packaging.
+description: Package and export Meson projects. Use for install layout, pkg-config metadata, shared-library versions, staged installs, `meson dist`, release archives, or downstream package consumers.
 ---
 
-# Meson Package Export and Distribution
+# Meson package export and distribution
 
-Use this skill when the goal is to ship a project cleanly to other users, package managers, or downstream build systems.
+## Workflow
 
-Runnable examples live under this skill's `examples/` directory.
+1. Identify the public headers, libraries, programs, data, and metadata.
+2. Inspect the configured prefix and every install declaration.
+3. Stage the install under `DESTDIR` and inspect the resulting tree.
+4. Test one downstream consumer against the staged metadata when the package exports a library.
+5. Run `meson dist` only from a clean, configured source checkout.
 
 ## Install the right things
 
@@ -17,7 +21,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.7.0',
+  meson_version: '>=1.1.0',
   license: 'MIT',
   license_files: ['LICENSE'],
   default_options: [
@@ -134,8 +138,7 @@ Document how the project fits those ecosystems instead of assuming every consume
 
 ## What belongs elsewhere
 
-- tests and install commands → `meson-testing-installation`
-- build-tree structure and dependencies → `meson-advanced-project-design`
-- complete templates → `meson-patterns-cookbook`
-
+- tests and install commands: `meson-testing-installation`
+- build-tree structure and dependencies: `meson-advanced-project-design`
+- complete examples: `meson-patterns-cookbook`
 

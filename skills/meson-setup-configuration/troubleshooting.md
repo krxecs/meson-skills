@@ -1,22 +1,21 @@
-# Troubleshooting: meson setup Issues
+# Troubleshoot `meson setup`
 
 ## `meson setup: command not found`
 
 Install Meson first and make sure it is on `PATH`.
 
-## Source directory already configured
+## Build directory already configured
 
 The source tree already has a build directory attached. Choose the approach that matches your intent:
 
-**A — Reconfigure in place (preserves build artifacts)**
+Reconfigure in place to preserve build artifacts:
 ```bash
 meson setup builddir --reconfigure
 ```
 
-**B — Start fresh (removes all build artifacts)**
+Resolve the build directory and use Meson's wipe operation to remove its artifacts:
 ```bash
-rm -rf builddir
-meson setup builddir
+meson setup builddir --wipe
 ```
 
 ## Wrong compiler is used
@@ -29,7 +28,7 @@ Run `meson setup builddir --reconfigure` or `meson configure builddir` after cha
 
 ## Stale cache after a toolchain change
 
-Use the modern combined refresh command:
+Clear cached dependency results during reconfiguration:
 
 ```bash
 meson setup builddir --reconfigure --clearcache
@@ -56,6 +55,4 @@ Then reconfigure with the desired build type.
 - assuming `--reconfigure` fixes a bad machine file
 - treating `--clearcache` as a substitute for a bad toolchain selection
 
-## Related setup guidance
-
-See `meson-setup-configuration/SKILL.md` for authoritative language standard selection details, including the recommended `default_options` block.
+Use `meson-setup-configuration` when the problem is choosing a language standard rather than diagnosing setup state.

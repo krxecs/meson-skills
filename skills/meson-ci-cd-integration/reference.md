@@ -1,4 +1,4 @@
-# Meson CI/CD Integration — Reference
+# Meson CI reference
 
 ## Recommended caches
 
@@ -42,5 +42,4 @@ meson install -C builddir --destdir stage
 ## Release jobs
 
 Keep release jobs separate from normal test jobs and prefer a clean configure there.
-
 

@@ -1,13 +1,17 @@
 ---
 name: meson-ci-cd-integration
-description: Integrate Meson builds into CI/CD pipelines. Use for GitHub Actions, GitLab CI, Jenkins, Azure Pipelines, build/test matrices, artifacts, coverage, sanitizers, release jobs, and caching strategy.
+description: Run Meson in continuous integration. Use for CI matrices, caches, artifacts, coverage, sanitizers, staged installs, and release jobs on GitHub Actions, GitLab CI, Jenkins, or Azure Pipelines.
 ---
 
-# Meson CI/CD Integration
+# Meson CI and release automation
 
-Use CI to prove that the project builds, tests, installs, and packages cleanly.
+## Workflow
 
-Runnable examples live under this skill's `examples/` directory.
+1. Inspect the project's supported platforms, machine files, dependency sources, and existing local commands.
+2. Reuse those commands in CI before adding matrices, caches, or release jobs.
+3. Give each cache a key derived from every input that can invalidate it.
+4. Run configure, compile, test, and the requested install or package check.
+5. Preserve logs or artifacts needed to diagnose a failed job.
 
 ## What CI should verify
 
@@ -67,7 +71,7 @@ jobs:
           path: |
             ~/.cache/ccache
             subprojects/packagecache
-          key: ${{ runner.os }}-meson-${{ matrix.buildtype }}-${{ hashFiles('meson.build', 'meson_options.txt', '**/*.wrap') }}
+          key: ${{ runner.os }}-meson-${{ matrix.buildtype }}-${{ hashFiles('meson.build', 'meson.options', '**/*.wrap') }}
       - run: meson setup builddir --buildtype=${{ matrix.buildtype }} -Dwarning_level=3
       - run: meson compile -C builddir
       - run: meson test -C builddir --print-errorlogs
@@ -82,7 +86,7 @@ Only do it when:
 - the build options are stable
 - the job is narrow and intentionally optimized for one exact shape
 
-Even then, prefer a narrow restore policy over a blanket “cache the whole build directory forever” approach.
+Even then, use a narrow restore policy instead of caching every build directory indefinitely.
 
 ## Introspection in CI
 
@@ -95,7 +99,7 @@ meson introspect builddir --dependencies
 meson introspect builddir --buildoptions
 ```
 
-## Good CI habits
+## CI checks
 
 - pin Meson, Ninja, and compiler versions in the job environment when possible
 - use a matrix for operating systems and build types
@@ -113,4 +117,4 @@ meson introspect builddir --buildoptions
 - not running install or staging checks
 - hiding the build shape from the logs
 
-
+Read [reference.md](reference.md) for cache invalidation and job ordering. Read [troubleshooting.md](troubleshooting.md) when tools are missing, restored state behaves differently, or local and CI results disagree.

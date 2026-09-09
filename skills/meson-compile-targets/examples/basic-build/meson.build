@@ -3,7 +3,7 @@ project(
   'c',
   'cpp',
   version: '0.1.0',
-  meson_version: '>=1.7.0',
+  meson_version: '>=1.1.0',
   license: '0BSD',
   license_files: ['LICENSE.md'],
   default_options: [
@@ -18,7 +18,7 @@ project(
 
 inc = include_directories('include')
 
-# Target name: 'demo'  →  meson compile -C build demo
+# Target name: 'demo'. Run meson compile -C build demo.
 demo_lib = static_library(
   'demo',
   'src/demo.cpp',
@@ -30,7 +30,7 @@ demo_dep = declare_dependency(
   link_with: demo_lib,
 )
 
-# Target name: 'demo-app'  →  meson compile -C build demo-app
+# Target name: 'demo-app'. Run meson compile -C build demo-app.
 app = executable(
   'demo-app',
   'src/main.cpp',
@@ -38,7 +38,7 @@ app = executable(
   install: true,
 )
 
-# Target name: 'demo-test'  →  meson compile -C build demo-test
+# Target name: 'demo-test'. Run meson compile -C build demo-test.
 test_exe = executable(
   'demo-test',
   'tests/test_demo.cpp',

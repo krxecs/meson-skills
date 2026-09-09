@@ -1,4 +1,4 @@
-# Meson Cross-Compilation — Troubleshooting
+# Troubleshoot Meson cross builds
 
 ## `Machine file not found`
 
@@ -12,7 +12,7 @@ Check the `[binaries]` section and make sure the toolchain prefix matches the cr
 
 The sysroot is not isolated well enough.
 
-**Fix:** set `pkg_config_libdir` and make sure the cross environment does not inherit host pkg-config paths.
+Set `pkg_config_libdir` and make sure the cross environment does not inherit host pkg-config paths.
 
 ## Target binaries cannot run during tests
 
@@ -40,6 +40,6 @@ Confirm whether a tool should live in a native file instead of the cross file.
 - using host pkg-config data for target libraries
 - assuming the cross file should contain build-machine helper tools
 
-## Language Standard Selection
+## Language standard selection
 
-Language standards are set via `[built-in options]`. See `meson-setup-configuration/SKILL.md` for the authoritative guidance.
+Set language standards in `[built-in options]`. Use `meson-setup-configuration` when choosing a standard during migration.

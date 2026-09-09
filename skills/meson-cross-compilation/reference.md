@@ -1,4 +1,4 @@
-# Meson Cross-Compilation — Reference
+# Meson cross-compilation reference
 
 ## Machine file sections
 
@@ -84,6 +84,6 @@ Then use those tools for generators, formatters, and packaging helpers.
 - assuming the build machine can run target binaries directly
 - putting generators for build tools into the cross file
 
-## Language Standard Selection
+## Language standard selection
 
-Language standards are set via `[built-in options]` in the machine file. See `meson-setup-configuration/SKILL.md` for the authoritative language standard selection guidance.
+Set language standards in the machine file's `[built-in options]`. Use `meson-setup-configuration` when choosing a standard during migration.

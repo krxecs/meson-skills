@@ -1,6 +1,6 @@
-# Wrap Fallback
+# Wrap fallback
 
-Shows how to prefer a system dependency and fall back to an in-tree source subproject (no `.wrap` file — the subproject lives directly under `subprojects/`).
+This example prefers a system dependency and falls back to a source subproject. It has no `.wrap` file because the subproject lives under `subprojects/`.
 
 ```bash
 meson setup builddir

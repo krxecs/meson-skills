@@ -1,4 +1,4 @@
-# Plugin System
+# Plugin system
 
 Build a host executable and a shared module plugin.
 

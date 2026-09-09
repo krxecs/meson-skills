@@ -1,4 +1,4 @@
-# Meson Advanced Project Design — Reference
+# Advanced Meson project design reference
 
 ## `declare_dependency()` quick reference
 
@@ -19,7 +19,7 @@ Consumers then use one object:
 executable('myapp', 'main.cpp', dependencies: mylib_dep)
 ```
 
-## Feature option declaration (`meson_options.txt`)
+## Feature option declaration (`meson.options`)
 
 ```ini
 option('wayland',  type: 'feature', value: 'auto',    description: 'Enable Wayland support')
@@ -47,9 +47,9 @@ endif
 | Both | `both_libraries()` | Downstream needs either form |
 | Module | `shared_module()` | Loadable plugin; never linked directly |
 
-`library()` respects the `default_library` option and lets the user choose at configure time — prefer it for public libraries when the type is not critical.
+`library()` respects the `default_library` option. Use it for public libraries when either static or shared output is acceptable.
 
-## `custom_target()` vs `generator()`
+## `custom_target()` and `generator()`
 
 | | `custom_target()` | `generator()` |
 |-|-------------------|---------------|
@@ -58,17 +58,19 @@ endif
 | Parallelism | One invocation | One invocation per input |
 
 ```meson
-# custom_target — one invocation
+# custom_target uses one invocation
+version_script = files('scripts/gen_version.py')
 version_h = custom_target('version-header',
   input:   'templates/version.in',
   output:  'version.hpp',
-  command: [python, 'scripts/gen_version.py', '@INPUT@', '@OUTPUT@'],
+  command: [python, version_script, '@INPUT@', '@OUTPUT@'],
 )
 
-# generator — one invocation per input file
+# generator uses one invocation per input file
+message_script = meson.current_source_dir() / 'scripts/gen_message.py'
 header_gen = generator(python,
   output:    '@BASENAME@.hpp',
-  arguments: ['scripts/gen_message.py', '@INPUT@', '@OUTPUT@'],
+  arguments: [message_script, '@INPUT@', '@OUTPUT@'],
 )
 message_headers = header_gen.process(files('hello.txt', 'farewell.txt'))
 ```
@@ -94,7 +96,7 @@ Meson prints this after `meson setup` so users can confirm what was enabled.
 ```text
 project/
 ├── meson.build          # project() + subdir() calls only
-├── meson_options.txt    # all option declarations
+├── meson.options        # all option declarations
 ├── include/             # public headers (installed)
 │   └── mylib/
 ├── src/                 # implementation + private headers
@@ -104,7 +106,7 @@ project/
 ```
 
 - `subdir('src')` before `subdir('tests')` so test targets can link against src targets.
-- Avoid deeply nested `subdir()` chains — keep the hierarchy shallow enough to scan at a glance.
+- Keep `subdir()` chains shallow enough to inspect without tracing many files.
 
 ## `configure_file()` for build-time constants
 
@@ -122,7 +124,7 @@ Access in code with `#include "config.h"`. The output lives in the build tree.
 ## Common design rules
 
 - One `declare_dependency()` per public library interface.
-- Feature options go in `meson_options.txt`, not in `meson.build` logic.
+- Feature options go in `meson.options`.
 - Global arguments (`add_project_arguments`) belong in the top-level `meson.build`, never in subprojects.
 - Generated files always go to the build tree (`@OUTPUT@`, not a source path).
 - Keep `subdir()` boundaries aligned with ownership: one directory = one team or one public interface.

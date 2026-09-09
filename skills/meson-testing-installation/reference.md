@@ -1,4 +1,4 @@
-# Meson Testing & Installation — Reference
+# Meson testing and installation reference
 
 ## Testing commands
 
@@ -45,7 +45,7 @@ meson install -C builddir --destdir "$PWD/stage"
 - check staging prefix permissions
 - check whether a target is intentionally non-installable
 
-## Good split of responsibilities
+## Responsibility boundaries
 
 - `meson.build` decides what is testable and installable
 - `meson test` runs the tests
@@ -56,4 +56,3 @@ meson install -C builddir --destdir "$PWD/stage"
 - expecting `meson test` to run installed binaries automatically
 - using a source-tree path inside a test that should be relocatable
 - installing private helper tools as if they were public API
-

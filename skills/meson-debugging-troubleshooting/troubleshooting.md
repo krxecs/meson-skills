@@ -1,4 +1,4 @@
-# Meson Debugging & Troubleshooting — Troubleshooting
+# Troubleshoot Meson builds
 
 ## Dependency not found
 
@@ -45,6 +45,6 @@ Check that the generated file is part of the target source list or is produced t
 - assuming `meson test` and `meson compile` share the same failure cause
 - forgetting to inspect the backend command line with `-v`
 
-## Language Standard Selection
+## Language standard selection
 
-For language standard selection guidance consult `meson-setup-configuration/SKILL.md` — this skill focuses on debugging and troubleshooting.
+For language standard selection, use `meson-setup-configuration`.

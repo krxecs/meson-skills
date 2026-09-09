@@ -1,295 +1,139 @@
-# Meson Freestanding Projects — Reference
+# Freestanding reference
 
-## Machine File Structure for `system = 'none'`
+## Machine file roles
 
-### `[host_machine]`
+`[binaries]` names target tools. `[host_machine]` describes the machine that will run the output. `[built-in options]` holds compiler and linker settings. `[properties]` holds project-specific metadata read with `meson.get_external_property()`.
 
-```ini
-[host_machine]
-system = 'none'
-cpu_family = 'x86'       # x86, x86_64, arm, aarch64, riscv32, riscv64
-cpu = 'i686'             # Architecture variant
-endian = 'little'
-```
+Prefer compiler drivers for linking. They know which target runtime objects and libraries accompany the selected language. Override linker selection only when the toolchain and Meson version support the requested linker.
 
-### `[binaries]`
-
-Freestanding toolchains use `-elf` or `-none-eabi` triplets:
+## RISC-V 64-bit preset
 
 ```ini
 [binaries]
-c = 'i686-elf-gcc'
-cpp = 'i686-elf-g++'
-ar = 'i686-elf-ar'
-c_ld = 'i686-elf-ld'
-strip = 'i686-elf-strip'
-objcopy = 'i686-elf-objcopy'
-```
+c = 'riscv64-unknown-elf-gcc'
+cpp = 'riscv64-unknown-elf-g++'
+ar = 'riscv64-unknown-elf-ar'
+strip = 'riscv64-unknown-elf-strip'
+objcopy = 'riscv64-unknown-elf-objcopy'
 
-### `[built-in options]`
-
-Standard freestanding flags — use this section, not `[properties]`, for compiler/linker args:
-
-```ini
-[built-in options]
-c_args = ['-ffreestanding', '-fno-pie', '-O2']
-c_link_args = ['-nostdlib', '-Wl,--gc-sections', '-Wl,-n']
-c_std = 'c17'
-cpp_std = 'c++20'
-```
-
-### `[properties]`
-
-Use only for custom metadata and C stdlib declaration:
-
-```ini
-[properties]
-freestanding_c_stdlib = 'picolibc'   # or 'newlib', 'none'
-kernel_base = 0xC0000000
-page_size = 4096
-```
-
-Access in meson.build:
-
-```meson
-c_stdlib = meson.get_external_property('freestanding_c_stdlib', 'none')
-if c_stdlib == 'picolibc'
-  picolibc_dep = subproject('picolibc').get_variable('picolibc_lib')
-endif
-```
-
-## Toolchain Presets
-
-### i686-elf (32-bit x86)
-
-```ini
-[host_machine]
-system = 'none'
-cpu_family = 'x86'
-cpu = 'i686'
-endian = 'little'
-
-[binaries]
-c = 'i686-elf-gcc'
-cpp = 'i686-elf-g++'
-ar = 'i686-elf-ar'
-c_ld = 'i686-elf-ld'
-
-[built-in options]
-c_args = ['-ffreestanding', '-fno-pie', '-O2']
-c_link_args = ['-nostdlib', '-Wl,--gc-sections', '-Wl,-n']
-```
-
-### riscv64-unknown-elf (RISC-V 64-bit)
-
-```ini
 [host_machine]
 system = 'none'
 cpu_family = 'riscv64'
 cpu = 'riscv64'
 endian = 'little'
 
-[binaries]
-c = 'riscv64-unknown-elf-gcc'
-cpp = 'riscv64-unknown-elf-g++'
-ar = 'riscv64-unknown-elf-ar'
-
 [built-in options]
-c_args = ['-ffreestanding', '-march=rv64i', '-mabi=lp64']
-c_link_args = ['-nostdlib', '-Wl,--gc-sections']
+c_args = ['-ffreestanding', '-march=rv64imac', '-mabi=lp64']
+c_link_args = ['-nostdlib', '-march=rv64imac', '-mabi=lp64', '-Wl,--gc-sections']
 ```
 
-### arm-none-eabi (ARM Cortex-M4)
+Match `-march` and `-mabi` to the processor and firmware ABI. Do not copy these values into a target with different extensions or floating-point support.
+
+## ARM Cortex-M4 preset
 
 ```ini
+[binaries]
+c = 'arm-none-eabi-gcc'
+cpp = 'arm-none-eabi-g++'
+ar = 'arm-none-eabi-ar'
+strip = 'arm-none-eabi-strip'
+objcopy = 'arm-none-eabi-objcopy'
+
 [host_machine]
 system = 'none'
 cpu_family = 'arm'
 cpu = 'cortex-m4'
 endian = 'little'
 
-[binaries]
-c = 'arm-none-eabi-gcc'
-cpp = 'arm-none-eabi-g++'
-ar = 'arm-none-eabi-ar'
-
 [built-in options]
-c_args = ['-ffreestanding', '-mcpu=cortex-m4', '-mthumb', '-mfloat-abi=hard', '-mfpu=fpv4-sp-d16']
-c_link_args = ['-nostdlib', '-Wl,--gc-sections', '-T', 'linker.ld']
+c_args = ['-ffreestanding', '-mcpu=cortex-m4', '-mthumb']
+c_link_args = ['-nostdlib', '-mcpu=cortex-m4', '-mthumb', '-Wl,--gc-sections']
 ```
 
-### aarch64-elf (ARM 64-bit bare-metal)
+Add `-mfpu` and `-mfloat-abi` only when the processor, ABI, and runtime libraries agree on the floating-point ABI.
+
+## AArch64 preset
 
 ```ini
+[binaries]
+c = 'aarch64-none-elf-gcc'
+cpp = 'aarch64-none-elf-g++'
+ar = 'aarch64-none-elf-ar'
+strip = 'aarch64-none-elf-strip'
+objcopy = 'aarch64-none-elf-objcopy'
+
 [host_machine]
 system = 'none'
 cpu_family = 'aarch64'
 cpu = 'aarch64'
 endian = 'little'
 
-[binaries]
-c = 'aarch64-elf-gcc'
-cpp = 'aarch64-elf-g++'
-ar = 'aarch64-elf-ar'
-
 [built-in options]
-c_args = ['-ffreestanding', '-O2']
+c_args = ['-ffreestanding', '-mgeneral-regs-only']
 c_link_args = ['-nostdlib', '-Wl,--gc-sections']
 ```
 
-## Detecting Freestanding Build in Code
+`-mgeneral-regs-only` is an AArch64 option. Keep it out of x86 machine files.
+
+## Linker script
+
+The exact script depends on the architecture and boot protocol. A freestanding script commonly needs:
+
+- `ENTRY()` for the startup symbol
+- `MEMORY` regions for firmware targets
+- fixed virtual or physical addresses for kernels
+- `KEEP()` for boot headers, interrupt vectors, and constructor tables
+- exported boundary symbols used by startup code
+- explicit alignment for pages, vectors, and stacks
+
+Pass the script to the compiler driver and make it a build dependency:
 
 ```meson
-if host_machine.system() == 'none'
-  message('Building for bare-metal/freestanding target')
-  add_project_arguments('-DKERNEL', language: 'c')
-endif
+script = files('arch/linker.ld')
+firmware = executable(
+  'firmware',
+  sources,
+  name_suffix: 'elf',
+  link_args: ['-Wl,-T,' + meson.current_source_dir() / 'arch/linker.ld'],
+  link_depends: script,
+)
 ```
 
-## Compiler Flag Reference
+## Boot images
 
-| Flag | Purpose | Required? |
-|------|---------|-----------|
-| `-ffreestanding` | Disable hosted libc, enable freestanding mode | Yes |
-| `-nostdlib` | Do not link standard startup or libc | Yes (link) |
-| `-fno-pie` | No position-independent executable | Often |
-| `-fno-pic` | No position-independent code | Often |
-| `-fno-stack-protector` | Disable stack protection (no libc) | Common |
-| `-fno-builtin` | Don't recognize built-in functions | Optional |
-| `-mgeneral-regs-only` | Don't use SIMD/FP registers (kernel safety) | Kernel safety |
-| `-Wl,--gc-sections` | Discard unused sections | Recommended |
-| `-Wl,-n` | Set text segment default (no page align) | Sometimes |
-| `-Wl,-T,linker.ld` | Custom linker script | Usually |
-
-## Linker Script Structure
-
-Complete linker script for a Multiboot kernel with constructor/destructor support:
-
-```ld
-ENTRY(_start)
-
-SECTIONS {
-    . = 1M;  /* Load address */
-
-    .multiboot : {
-        KEEP(*(.multiboot))
-    }
-
-    .text : {
-        *(.text)
-        *(.text.*)
-    }
-
-    .rodata : {
-        *(.rodata)
-        *(.rodata.*)
-    }
-
-    .data : {
-        *(.data)
-    }
-
-    .bss : {
-        *(COMMON)
-        *(.bss)
-    }
-
-    .init_array : {
-        __init_array_start = .;
-        KEEP(*(.init_array))
-        __init_array_end = .;
-    }
-
-    .fini_array : {
-        __fini_array_start = .;
-        KEEP(*(.fini_array))
-        __fini_array_end = .;
-    }
-}
-```
-
-## Section Attributes
-
-```c
-/* Multiboot header */
-__attribute__((section(".multiboot")))
-const unsigned multiboot_header[] = { 0x1BADB002, 0x00, -(0x1BADB002 + 0x00) };
-
-/* Constructor table entry */
-__attribute__((section(".init_array")))
-void (*init_func)(void) = &my_init;
-
-/* Page-aligned BSS section */
-__attribute__((section(".bss"), aligned(4096)))
-char kernel_stack[16384];
-```
-
-## Installing Freestanding Toolchains
-
-```bash
-# i686-elf — build from source via crosstool-NG or use prebuilt tools
-# riscv64-unknown-elf — apt install gcc-riscv64-unknown-elf (some distros)
-# arm-none-eabi — apt install gcc-arm-none-eabi
-# aarch64-elf — apt install gcc-aarch64-linux-gnu (Linux-targeting; bare-metal needs source build)
-```
-
-## Building ISO Images
-
-Meson does not invoke a shell for `custom_target` commands, so multi-step operations must be split into separate targets rather than joined with `&&`. Stage the ISO directory tree first, then invoke `grub-mkrescue` on the staged root:
+Model each transformation as a build target. Put multi-step filesystem work in a checked script rather than shell operators inside `custom_target()`.
 
 ```meson
-# In meson.build
-kernel_elf = executable('kernel.elf', ...)
+image_tool = find_program('scripts/make-image.py')
 
-exe_cp = find_program('cp')
-
-# Stage grub.cfg into isodir/boot/grub/ inside the build tree.
-# TODO: In Meson 1.12+, replace with fs.copyfile(... build_subdir: ...)
-grub_cfg = custom_target(
-  'grub_cfg',
-  input: 'boot/grub/grub.cfg',
-  output: 'grub.cfg',
-  build_subdir: 'isodir/boot/grub',
-  command: [exe_cp, '@INPUT@', '@OUTPUT@'],
-)
-
-# Stage kernel.elf into isodir/boot/ inside the build tree.
-# TODO: In Meson 1.12+, replace with fs.copyfile(... build_subdir: ...)
-kernel_copy = custom_target(
-  'kernel_copy',
-  input: kernel_elf,
-  output: 'kernel.elf',
-  build_subdir: 'isodir/boot',
-  command: [exe_cp, '@INPUT@', '@OUTPUT@'],
-)
-
-exe_grub_mkrescue = find_program('grub-mkrescue')
-build_iso = custom_target(
-  'iso',
-  input: [grub_cfg, kernel_copy],
-  output: 'kernel.iso',
-  command: [exe_grub_mkrescue, '-o', '@OUTPUT@', '@BUILD_ROOT@/isodir'],
+image = custom_target(
+  'boot-image',
+  input: firmware,
+  output: 'firmware.bin',
+  command: [image_tool, '@INPUT@', '@OUTPUT@'],
   build_by_default: true,
 )
 ```
 
-GRUB config (`boot/grub/grub.cfg`):
-```cfg
-set timeout=5
-set default=0
-menuentry "My Kernel" {
-    multiboot /boot/kernel.elf
-    boot
-}
-```
+The script should create parent directories, fail on the first error, and write only inside the build tree.
 
-Verify ISO contents:
+## Runtime libraries
+
+A freestanding compiler may still emit calls to compiler runtime helpers. Inspect undefined symbols before choosing support code:
+
 ```bash
-isoinfo -l -i build/kernel.iso
-# Should show /boot/kernel.elf and /boot/grub/grub.cfg
+target-nm -u builddir/firmware.elf
 ```
 
+Provide the smallest ABI-compatible runtime that resolves required symbols. Pin third-party sources and export their include paths, compile arguments, and link inputs through a dependency object.
 
-## Language Standard Selection for Freestanding Targets
+## Validation by artifact type
 
-Freestanding toolchains (e.g. `i686-elf-gcc`) support the same `c_std` / `cpp_std` options as hosted compilers. Set them in the machine file's `[built-in options]` alongside the freestanding flags. The presets above use `c_std=c17` and `cpp_std=c++20` — match these to your toolchain's default unless the project requires GNU extensions for low-level operations.
+| Artifact | Checks |
+|---|---|
+| ELF kernel | ELF class, machine, entry point, program headers, required boot header |
+| Raw firmware | size, load address, vector table, checksum if required |
+| GRUB image | `grub-file`, ISO contents, emulator boot |
+| UEFI image | PE/COFF machine type, firmware load, expected entry point |
+
+Use target-prefixed binutils when host tools do not support the target format.

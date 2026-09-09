@@ -1,4 +1,4 @@
-# Meson Pattern Snippets
+# Meson pattern snippets
 
 Runnable examples live in each owning skill's `examples/` directory. The patterns described in this cookbook's `SKILL.md` are self-contained snippets meant to illustrate a single concept; they are not standalone projects and do not live here.
 

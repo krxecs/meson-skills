@@ -1,4 +1,4 @@
-# Meson Testing & Installation — Troubleshooting
+# Troubleshoot Meson tests and installation
 
 ## Tests do not run
 
@@ -46,4 +46,3 @@ This is usually a missing runtime dependency, not an installation bug. Check lin
 - confusing build-tree tests with install-tree tests
 - not staging installs in CI before release
 - letting tests rely on mutable state in the source tree
-

@@ -1,130 +1,71 @@
 ---
 name: meson-testing-installation
-description: Run tests and install build targets using Meson. Use this skill whenever the user wants to run tests, debug test failures, filter tests by suite or name, set up CI test pipelines, or install to a custom prefix or staging directory — even if they just say "how do I run only unit tests" or "how do I install to /opt".
+description: Run Meson tests and installation checks. Use for test names or suites, failure logs, test wrappers, install prefixes, staging with `DESTDIR`, dry runs, and install tags.
 ---
 
-# Meson Testing & Installation
+# Meson testing and installation
 
-`meson test` runs project tests, and `meson install` puts built artifacts into their final location. For pkg-config exports, release tarballs, and packaging layout, use `meson-package-export-distribution`.
+Tests run from the build tree. Installation copies only artifacts declared for installation.
 
-Runnable examples live under this skill's `examples/` directory.
+## Workflow
 
-## Quick Start
+1. Inspect the configured build directory and list tests or the install plan when scope is unclear.
+2. Run the narrow test or staging install requested.
+3. Capture failure logs or inspect the staged tree.
+4. Report the command and result. A successful compile does not prove tests or installation.
 
-**Run all tests:**
-```bash
-meson test -C build
-```
-
-**List available tests:**
-```bash
-meson test -C build --list
-```
-
-**Run specific test:**
-```bash
-meson test -C build test_name
-```
-
-**Install project:**
-```bash
-meson install -C build
-```
-
-**Dry-run (see what would be installed):**
-```bash
-meson install -C build --dry-run
-```
-
-## Why tests and installs are separate
-
-Testing answers “does it work here?”
-Installation answers “does the project stage correctly?”
-
-A healthy project should prove both.
-
-## meson test: Reference
-
-### Basic syntax
+## Test commands
 
 ```bash
-meson test [options] [test_names...]
+meson test -C builddir
+meson test -C builddir --list
+meson test -C builddir core
+meson test -C builddir --suite unit
+meson test -C builddir --print-errorlogs
 ```
 
-### Common options
+Useful options include:
 
-| Option | Purpose |
-|--------|---------|
-| `-C BUILDDIR` | Build directory |
-| `--list` | List available tests (don't run) |
-| `-j JOBS` | Parallel test jobs |
-| `-v, --verbose` | Verbose output |
-| `--no-rebuild` | Don't rebuild before testing |
-| `--gdb` | Run failing tests under gdb |
-| `--benchmark` | Run benchmark tests |
-| `--suite SUITE` | Run only one suite |
-| `--print-errorlogs` | Print failing test logs |
+| Option | Effect |
+|---|---|
+| `--no-rebuild` | Runs tests without rebuilding first |
+| `--gdb` | Runs the selected test under GDB |
+| `--wrapper COMMAND` | Runs tests through a tool such as Valgrind |
+| `--benchmark` | Runs benchmarks instead of ordinary tests |
+| `-j N` | Sets the number of concurrent test processes |
 
-## Test suites
-
-Use suites to keep test categories readable:
-
-- `unit`
-- `integration`
-- `slow`
-- `compile`
-- `install`
-
-Example:
+Define suites in `meson.build` when users need stable groups:
 
 ```meson
 test('core', core_test, suite: 'unit')
 ```
 
-## Install patterns
+## Install commands
 
-### Install with custom prefix
-
-```bash
-meson setup build --prefix=/opt/myapp
-meson install -C build
-```
-
-### Install into a package root
+Set the final prefix during setup. Use `--destdir` to prepend a temporary package root.
 
 ```bash
-meson install -C build --destdir "$pkgdir"
+meson setup builddir --prefix=/usr
+meson install -C builddir --dry-run
+meson install -C builddir --destdir "$PWD/stage"
 ```
 
-### Use a staging tree in CI
+Inspect the staged tree under `stage/usr` for this example. A staging install must not write into the live prefix.
 
-```bash
-meson install -C build --destdir "$PWD/stage"
-```
+## Install checks
 
-## Common install helpers
-
-- `install_headers()`
-- `install_man()`
-- `install_data()`
-- `install_subdir()`
-- `install_symlink()`
-- `install_emptydir()`
-
-## Install checklist
-
-- public headers installed intentionally
-- shared library versioning set if the ABI is stable
-- pkg-config metadata exported if downstream users need it
-- private files kept out of the public prefix
-- staging installs tested in CI
+- Every public target has `install: true` where required.
+- Public headers and data use the matching install helper.
+- Private headers and build helpers stay out of the install tree.
+- Shared libraries carry the intended ABI version.
+- Downstream metadata points to installed paths, not build-tree paths.
 
 ## Common mistakes
 
-- confusing “built successfully” with “installed correctly”
-- forgetting `install: true` on the target that should ship
-- letting tests depend on the source directory layout
-- writing tests that require a full install when a build-tree test would be simpler
-- failing to check the install tree in CI
+- assuming compilation runs the tests
+- using `--no-rebuild` with stale artifacts
+- treating `DESTDIR` as the final installation prefix
+- testing paths that only exist in the source checkout
+- checking a dry run without checking the staged files
 
-
+Read [reference.md](reference.md) for test metadata and install helpers. Read [troubleshooting.md](troubleshooting.md) when tests are missing, logs are hidden, or installed files land in the wrong path. Use `meson-package-export-distribution` for pkg-config metadata and releases.

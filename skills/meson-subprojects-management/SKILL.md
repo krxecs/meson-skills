@@ -1,13 +1,16 @@
 ---
 name: meson-subprojects-management
-description: Manage Meson subprojects, wraps, vendored dependencies, and fallback resolution. Use this skill whenever the user mentions subprojects, .wrap files, WrapDB, vendored dependencies, fallback dependencies, or dependency resolution that can come from either the system or a bundled source tree.
+description: Manage Meson subprojects and dependency fallbacks. Use for `.wrap` files, WrapDB, vendored sources, package caches, `subproject()`, or choosing between system and bundled dependencies.
 ---
 
-# Meson Subprojects and Dependency Management
+# Meson subprojects and dependencies
 
-Use subprojects when a dependency is not available on the system, or when the project deliberately vendors a known-good copy.
+## Workflow
 
-Runnable examples live under this skill's `examples/` directory.
+1. Inspect the existing `dependency()`, wrap file, and exported subproject variable.
+2. Decide whether the system package, fallback, or forced fallback should win.
+3. Keep that decision at the highest practical project level and pass one dependency object to consumers.
+4. Configure once with the normal policy and once with the required fallback policy when both paths are supported.
 
 ## Core policy
 
@@ -106,20 +109,20 @@ Avoid vendoring when:
 
 ## What belongs elsewhere
 
-- build-system basics → `meson-build-system`
-- CI cache strategy for wraps → `meson-ci-cd-integration`
-- dependency design and interfaces → `meson-advanced-project-design`
-- install/export packaging → `meson-package-export-distribution`
+- build-system basics: `meson-build-system`
+- CI cache strategy for wraps: `meson-ci-cd-integration`
+- dependency design and interfaces: `meson-advanced-project-design`
+- install and export packaging: `meson-package-export-distribution`
 
-## Language Standard Selection Guidance for Subprojects
+## Language standards in subprojects
 
-Subprojects inherit language defaults from the parent project's `default_options` only when they do not set their own. If a subproject explicitly sets `c_std` or `cpp_std` in its own `project()` defaults, those values win for that subproject's targets.
-
-When vendoring an existing library as a subproject, preserve the upstream standard choice so the imported code behaves the same way it did before vendoring:
+Preserve an upstream subproject's standard choice unless the project has tested a local override:
 
 ```meson
 # Vendored upstream subproject
 project('mylib', 'c', default_options: ['c_std=c11'])
 ```
 
-For a new subproject that you control, prefer the same standards as the parent project unless a target-specific reason requires a different baseline.
+For a new subproject that you control, align its standards with the parent unless a target requires another value.
+
+Read [reference.md](reference.md) for wrap types and dependency boundaries. Read [troubleshooting.md](troubleshooting.md) when resolution selects the wrong version, cache, or source.

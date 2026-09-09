@@ -1,4 +1,4 @@
-# Package Installation
+# Package installation
 
 Shows how install layout, staging, and pkg-config export fit together.
 

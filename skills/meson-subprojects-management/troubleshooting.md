@@ -1,33 +1,34 @@
-# Meson Subprojects Management — Troubleshooting
+# Troubleshoot Meson subprojects
 
-## `Subproject not found`
+## A subproject is not found
 
-Check that the wrap file exists and that fallback is enabled in the parent project.
+Confirm that a matching directory or wrap exists under the top-level `subprojects/` directory. Inspect `--wrap-mode` before assuming fallback is enabled.
 
-## Wrong version is picked
+## The wrong source wins
 
-A wrap or system dependency may be older than expected. Confirm the dependency choice with the Meson log and the wrap files in `subprojects/`.
+Read `meson-logs/meson-log.txt` to see whether Meson resolved a system package, CMake package, cached wrap, or source subproject. Reconfigure with the intended policy:
 
-## The subproject keeps rebuilding unexpectedly
+```bash
+meson setup builddir --reconfigure --force-fallback-for=foo
+```
 
-Check whether the build directory was reused with changed source trees, wrap files, or options. If so, reconfigure or wipe the build directory.
+Use `--wrap-mode=nofallback` when the build must use system dependencies.
 
-## The subproject should be vendored, but packaging forbids it
+## A fallback exports the wrong variable
 
-Prefer a system dependency and keep fallback only as a development convenience when the downstream policy allows it.
+Match the second item in `fallback: ['foo', 'foo_dep']` to a top-level variable in `subprojects/foo/meson.build`. That variable should usually hold a `declare_dependency()` result.
 
-## Stale wrap cache
+## Cached sources are stale
 
-Purge the wrap cache and fetch again:
+Inspect the wrap revision and cached directory first. If the cache may be discarded and downloaded again, run:
 
 ```bash
 meson subprojects purge --confirm --include-cache
 meson subprojects download
 ```
 
+The purge is destructive. Record local patches or offline requirements before running it.
 
-## Subproject language standard policy
+## Downstream packaging forbids vendoring
 
-Subprojects inherit language defaults from the parent project's `default_options` only when they do not set their own. If a subproject explicitly sets `c_std` or `cpp_std` in its own `project()` defaults, those win for that subproject's targets.
-
-When vendoring an existing library as a subproject, preserve its original language standard to avoid subtle ABI or behavioral differences. For new subprojects, prefer the same standards as the parent project.
+Keep the fallback for development only if policy permits it. Configure the packaging job with `--wrap-mode=nofallback` and verify that all required system dependencies resolve.
