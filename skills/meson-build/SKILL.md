@@ -1,9 +1,9 @@
 ---
-name: meson-build-system
-description: Build, configure, test, install, package, debug, and maintain Meson projects. Use for Meson setup and options, targets, tests, installs, cross or freestanding builds, subprojects, CI, project design, version compatibility, distribution, troubleshooting, or runnable Meson examples.
+name: meson-build
+description: Create, build, configure, test, install, package, debug, and maintain Meson projects. Use for Meson project setup, options, targets, tests, installs, cross or freestanding builds, subprojects, CI, project design, version compatibility, distribution, troubleshooting, or runnable examples. Use convert-to-meson when replacing another build system.
 ---
 
-# Meson build system
+# Meson build
 
 Inspect the relevant `meson.build`, `meson.options`, machine files, wraps, and CI files before editing. Inspect the configured build directory before recommending a command. Keep changes local to the requested behavior.
 
@@ -19,7 +19,7 @@ Build directories are disposable. Keep project metadata in `project()`, project 
 
 ## References
 
-- [Setup and configuration](references/setup-configuration.md): setup, compilers, options, build types, reconfiguration, and migration standards.
+- [Setup and configuration](references/setup-configuration.md): setup, compilers, options, build types, and reconfiguration.
 - [Compile targets](references/compile-targets.md): target selection, backend arguments, and compile failures.
 - [Testing and installation](references/testing-installation.md): tests, suites, staging, and install rules.
 - [Cross-compilation](references/cross-compilation.md): native and cross files, sysroots, wrappers, and target tools.
@@ -37,4 +37,3 @@ Build directories are disposable. Keep project metadata in `project()`, project 
 - The changed definition expresses the requested behavior without duplicate flags or hidden build-tree state.
 - Every affected target configures and compiles.
 - Tests, staged installs, package checks, and artifact inspection run when the request makes them relevant.
-- The project keeps its established `meson_version: '>=1.7.0'` baseline unless a documented repository policy change asks for another value.

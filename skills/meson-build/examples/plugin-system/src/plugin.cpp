@@ -1,11 +1,9 @@
 #include "plugdemo/plugin_api.hpp"
 
-namespace plugdemo {
-const char* plugin_name() {
+const char* plugin_name(void) {
   return "sample_plugin";
 }
 
-int plugin_entry() {
+int plugin_entry(void) {
   return 7;
-}
 }

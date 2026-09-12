@@ -22,7 +22,7 @@ meson setup builddir --native-file native.ini
 meson setup builddir --cross-file cross.ini
 ```
 
-During a migration, read CMake, Autotools, Makefiles, CI, and compiler scripts for existing language standard choices. Ask when they do not establish one. Do not change standards silently. New projects must record the chosen compiler-supported standards in `default_options`.
+New projects must record the chosen compiler-supported language standards in `default_options`. When the source tree does not establish a standard, ask before choosing one.
 
 If Meson is missing, install it and put it on `PATH`. A compiler picked at first setup requires a new or wiped build when it changes. Reconfigure ignored options. Check `--cross-file` and `--native-file` separately when output shape is wrong. Use introspection to confirm an unexpected build type.
 

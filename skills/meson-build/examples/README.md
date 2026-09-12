@@ -3,7 +3,7 @@
 Each directory is a runnable project. Configure it from the repository root with a separate build directory.
 
 ```bash
-meson setup builddir skills/meson-build-system/examples/basic-build
+meson setup builddir skills/meson-build/examples/basic-build
 meson compile -C builddir
 meson test -C builddir
 ```

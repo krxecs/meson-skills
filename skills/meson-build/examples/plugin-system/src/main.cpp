@@ -1,5 +1,3 @@
-#include "plugdemo/plugin_api.hpp"
-
 #include <iostream>
 #include <string_view>
 
@@ -39,6 +37,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  std::cout << name() << ": " << entry() << '\n';
-  return 0;
+  const int result = entry();
+  std::cout << name() << ": " << result << '\n';
+  return result == 7 ? 0 : 1;
 }
