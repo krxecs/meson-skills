@@ -10,17 +10,10 @@ meson test -C builddir
 
 | Example | Purpose | Checks |
 |---|---|---|
-| [basic-build](basic-build/) | Named library, executable, and test | Compile and test |
-| [cross-compilation](cross-compilation/) | Native generator and cross target | Cross setup and compile, target runtime needs a wrapper |
-| [executable-with-tests](executable-with-tests/) | Application with unit tests | Compile, test, staged install |
-| [generated-sources](generated-sources/) | `custom_target()` and `generator()` output | Compile and run |
-| [github-actions](github-actions/) | GitHub Actions Meson pipeline | Local compile and test, workflow review |
-| [mixed-c-cpp](mixed-c-cpp/) | C API with C++ caller | Compile and run |
-| [package-installation](package-installation/) | Headers, data, and staged install | Compile, test, staged install |
-| [pkg-config-export](pkg-config-export/) | Shared library and pkg-config file | Compile, test, staged install |
-| [plugin-system](plugin-system/) | Runtime-loaded module | Compile and run |
-| [reusable-library](reusable-library/) | C++ library and dependency object | Compile and test |
-| [windows-msvc](windows-msvc/) | MSVC-oriented project | Requires Windows and MSVC |
+| [basic-build](basic-build/) | Named targets, a library, an executable, and unit/smoke tests | Compile and test |
+| [cross-compilation](cross-compilation/) | Native build tool, cross-machine configuration, and generated output | Cross setup and compile, target runtime needs a wrapper |
+| [shared-library](shared-library/) | C ABI shared library, C++ consumer, installation, and pkg-config export | Compile, test, staged install, downstream package check |
+| [plugin-system](plugin-system/) | Runtime-loaded module and exported entry point | Compile, load, and run |
 | [wrap-fallback](wrap-fallback/) | System dependency with nested `tinydep` fallback | Compile, test, and fallback setup |
 
 Each project keeps its own README, source files, licenses, scripts, templates, and machine files. `wrap-fallback/subprojects/tinydep` is part of the fallback example.

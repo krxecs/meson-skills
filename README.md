@@ -33,7 +33,7 @@ The skill's [references](skills/meson-build-system/references/) hold topic-speci
 
 ## Examples
 
-The [example index](skills/meson-build-system/examples/README.md) lists 12 runnable projects, including generated sources, cross builds, package exports, a GitHub Actions workflow, and an in-tree fallback dependency.
+The [example index](skills/meson-build-system/examples/README.md) lists five runnable projects. It covers ordinary builds, cross-machine constraints, a shared-library distribution boundary, runtime modules, and fallback dependencies.
 
 ## Contributing
 

@@ -22,6 +22,7 @@ plugin = shared_module(
   'sample_plugin',
   'src/plugin.cpp',
   include_directories: inc,
+  cpp_args: ['-DPLUGIN_BUILD'],
   install: true,
   install_dir: get_option('libdir') / 'plugdemo' / 'plugins',
 )
@@ -39,4 +40,4 @@ host = executable(
   install: true,
 )
 
-test('host-smoke', host, args: ['--help'])
+test('plugin-load', host, args: [plugin.full_path()])

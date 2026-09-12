@@ -25,7 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
       - run: python -m pip install meson ninja
-      - run: meson setup builddir --buildtype=${{ matrix.buildtype }} -Dwarning_level=3
+      # Template: point the source directory at the project under test.
+      - run: meson setup builddir skills/meson-build-system/examples/basic-build --buildtype=${{ matrix.buildtype }} -Dwarning_level=3
       - run: meson compile -C builddir
       - run: meson test -C builddir --print-errorlogs
 ```

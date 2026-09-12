@@ -23,7 +23,7 @@ mylib_dep = declare_dependency(include_directories: inc, link_with: mylib, depen
 
 Use `static_library()` for internal or embedded reuse, `shared_library()` for a stable ABI, `both_libraries()` when downstreams need both, and `shared_module()` for runtime-loaded plugins. `library()` follows `default_library` when either form satisfies the public contract.
 
-Use `custom_target()` for one command and `generator()` for a tool applied to many inputs. Give commands source inputs and `@OUTPUT@`; resolve scripts from the source directory. Pass generated targets as sources and expose their build directory to consumers. Use `configuration_data()` and `configure_file()` for build-time constants. `summary()` should report final choices.
+Use `custom_target()` for one command and `generator()` for a tool applied to many inputs. The [cross-compilation example](../examples/cross-compilation/) shows a native build tool producing a target input through `custom_target()`. Give commands source inputs and `@OUTPUT@`; resolve scripts from the source directory. Pass generated targets as sources and expose their build directory to consumers. Use `configuration_data()` and `configure_file()` for build-time constants. Keep those APIs documented here rather than adding ordinary generated-source projects. `summary()` should report final choices.
 
 `add_project_arguments()` affects later targets in the project. Put target-only arguments on the target. Put global arguments at the top level, never in subprojects. Prefer explicit, versioned dependencies, deterministic generators, pinned CI tools, and version-controlled machine files. Consider the update cost, ABI duplication, patches, and packaging support before vendoring.
 
