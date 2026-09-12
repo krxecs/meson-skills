@@ -1,0 +1,21 @@
+{
+  "name": "meson-skills",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "fmt": "oxfmt --write \"**/*.md\"",
+    "fmt:check": "oxfmt --check \"**/*.md\""
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.4.1",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.4.1",
+  "type": "module",
+  "devDependencies": {
+    "oxfmt": "^0.67.0"
+  }
+}

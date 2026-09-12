@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: '3.12'}
+        with: { python-version: "3.12" }
       - run: python -m pip install meson ninja
       # Template: point the source directory at the project under test.
       - run: meson setup builddir skills/meson-build/examples/basic-build --buildtype=${{ matrix.buildtype }} -Dwarning_level=3

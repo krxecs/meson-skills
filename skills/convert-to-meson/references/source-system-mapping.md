@@ -6,20 +6,20 @@ Identify where the current build system owns each behavior. Read the files and i
 
 Inspect `CMakeLists.txt`, included `.cmake` modules, presets, toolchain files, and package configuration templates.
 
-| CMake concept | Meson destination |
-|---|---|
-| `project()` and cache defaults | `project()` and `meson.options` |
-| `add_executable()` and `add_library()` | matching Meson target functions |
-| `target_sources()` | target source arguments and `files()` |
-| `target_include_directories()` | `include_directories()` and dependency objects |
-| `target_compile_definitions()` and `target_compile_options()` | target arguments or Meson built-in options |
-| `target_link_libraries()` | `link_with`, `link_whole`, or `dependencies` according to ownership |
-| `find_package()` | `dependency()`, including `method: 'cmake'` only when needed |
-| `option()` and cache variables | typed options in `meson.options` |
-| `configure_file()` | `configuration_data()` with `configure_file()` |
-| custom commands and generated sources | `custom_target()` or `generator()` with outputs passed to consumers |
-| CTest declarations | `test()` and `benchmark()` |
-| `install()` and package exports | target install settings, install helpers, and package metadata |
+| CMake concept                                                 | Meson destination                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `project()` and cache defaults                                | `project()` and `meson.options`                                     |
+| `add_executable()` and `add_library()`                        | matching Meson target functions                                     |
+| `target_sources()`                                            | target source arguments and `files()`                               |
+| `target_include_directories()`                                | `include_directories()` and dependency objects                      |
+| `target_compile_definitions()` and `target_compile_options()` | target arguments or Meson built-in options                          |
+| `target_link_libraries()`                                     | `link_with`, `link_whole`, or `dependencies` according to ownership |
+| `find_package()`                                              | `dependency()`, including `method: 'cmake'` only when needed        |
+| `option()` and cache variables                                | typed options in `meson.options`                                    |
+| `configure_file()`                                            | `configuration_data()` with `configure_file()`                      |
+| custom commands and generated sources                         | `custom_target()` or `generator()` with outputs passed to consumers |
+| CTest declarations                                            | `test()` and `benchmark()`                                          |
+| `install()` and package exports                               | target install settings, install helpers, and package metadata      |
 
 Read generator expressions and target property propagation before mapping them. A CMake target may carry transitive includes, definitions, link inputs, and platform conditions that are not visible at the call site.
 
