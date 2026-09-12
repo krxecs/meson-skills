@@ -2,9 +2,15 @@
   "name": "meson-skills",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "fmt": "oxfmt --write \"**/*.md\"",
-    "fmt:check": "oxfmt --check \"**/*.md\""
+    "fmt": "oxfmt --write \"**/*.{md,json,jsonc,yaml,yml,toml}\"",
+    "fmt:check": "oxfmt --check \"**/*.{md,json,jsonc,yaml,yml,toml}\"",
+    "prepare": "lefthook install"
+  },
+  "devDependencies": {
+    "lefthook": "^2.1.12",
+    "oxfmt": "^0.67.0"
   },
   "devEngines": {
     "packageManager": {
@@ -13,9 +19,5 @@
       "onFail": "download"
     }
   },
-  "packageManager": "pnpm@12.4.1",
-  "type": "module",
-  "devDependencies": {
-    "oxfmt": "^0.67.0"
-  }
+  "packageManager": "pnpm@12.4.1"
 }

@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    fmt:
+      glob: "**/*.{md,json,jsonc,yaml,yml,toml}"
+      run: pnpm exec oxfmt --write {staged_files}
+      stage_fixed: true
