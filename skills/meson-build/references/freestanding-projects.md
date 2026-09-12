@@ -1,6 +1,6 @@
 # Freestanding projects
 
-Use this reference when the host machine has `system = 'none'`. Inspect the architecture, ABI, compiler driver, linker script, entry point, image format, and boot protocol. Put toolchain-wide arguments in the cross file and target-only arguments on the target.
+Use this reference when the host machine has `system = 'none'`. Inspect the architecture, ABI, compiler driver, linker script, entry point, image format, and boot protocol. Keep arguments required by every freestanding project in the project definition. In GNU or GNU-style toolchains, this includes `-ffreestanding`, PIE and stack-protector settings, `-nostdlib`, linker options, and the C++ exception and RTTI policy. Pair `--gc-sections` with `-ffunction-sections` and `-fdata-sections`. Put an argument in the cross file only when it depends on the selected toolchain or target machine; put target-only arguments on the target.
 
 ```ini
 [binaries]
@@ -16,16 +16,28 @@ cpu_family = 'x86'
 cpu = 'i686'
 endian = 'little'
 
-[built-in options]
-c_std = 'c17'
-cpp_std = 'c++20'
-c_args = ['-ffreestanding', '-fno-pie', '-fno-stack-protector']
-cpp_args = ['-ffreestanding', '-fno-pie', '-fno-stack-protector', '-fno-exceptions', '-fno-rtti']
-c_link_args = ['-nostdlib', '-no-pie', '-Wl,--gc-sections']
-cpp_link_args = ['-nostdlib', '-no-pie', '-Wl,--gc-sections']
 ```
 
 ```meson
+project('kernel', 'c', 'cpp',
+  default_options: ['c_std=c17', 'cpp_std=c++20'])
+
+add_project_arguments(
+  '-ffreestanding',
+  '-fno-pie',
+  '-fno-stack-protector',
+  '-ffunction-sections',
+  '-fdata-sections',
+  language: ['c', 'cpp'],
+)
+add_project_arguments('-fno-exceptions', '-fno-rtti', language: 'cpp')
+add_project_link_arguments(
+  '-nostdlib',
+  '-no-pie',
+  '-Wl,--gc-sections',
+  language: ['c', 'cpp'],
+)
+
 script = files('arch/i686/linker.ld')
 kernel = executable('kernel', 'arch/i686/entry.S', 'src/main.c',
   name_suffix: 'elf',
